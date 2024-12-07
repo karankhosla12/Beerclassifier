@@ -24,18 +24,6 @@
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            display: none; /* Hide container initially */
-        }
-        .flash {
-            animation: flash-animation 0.2s linear infinite;
-        }
-        @keyframes flash-animation {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0;
-            }
         }
         .list-group-item {
             font-size: 1.1em;
@@ -43,11 +31,8 @@
     </style>
 </head>
 <body>
-    <div id="flashImage" class="text-center mt-5">
-        <img src="gdu.jpeg" alt="Flashing Image" class="flash" id="flashingImage">
-    </div>
     <div class="container mt-5">
-        <img id="logo" src="beer.jpeg" alt="Beer Logo">
+        <img id="logo" src="beer.jpg" alt="Beer Logo">
         <h1 class="text-center">Beer Type Classifier</h1>
         <form id="uploadForm" class="mt-4">
             <div class="mb-3">
@@ -60,17 +45,6 @@
     </div>
 
     <script>
-        window.addEventListener('load', () => {
-            const flashImage = document.getElementById('flashImage');
-            const container = document.querySelector('.container');
-
-            // Set a timer to hide the flashing image and show the main container after 2 seconds
-            setTimeout(() => {
-                flashImage.style.display = 'none';
-                container.style.display = 'block';
-            }, 2000);
-        });
-
         const API_URL = "https://api-inference.huggingface.co/models/openai/clip-vit-large-patch14";
         const API_KEY = "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";
         const BEER_TYPES = [
@@ -114,7 +88,7 @@
                             const probabilities = data.scores;
 
                             if (labels.length !== probabilities.length) {
-                                resultDiv.innerHTML = '<p class="text-danger">Unexpected response structure.</p>';
+                                resultDiv.innerHTML = '<p class="text-danger">Error: Mismatched labels and scores.</p>';
                                 return;
                             }
 
@@ -127,7 +101,7 @@
 
                             resultDiv.innerHTML = resultHtml;
                         } else {
-                            resultDiv.innerHTML = '<p class="text-danger">Invalid response data.</p>';
+                            resultDiv.innerHTML = '<p class="text-danger">Invalid response data format.</p>';
                         }
                     } else {
                         const error = await response.json();

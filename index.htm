@@ -24,6 +24,18 @@
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none; /* Hide container initially */
+        }
+        .flash {
+            animation: flash-animation 0.2s linear infinite;
+        }
+        @keyframes flash-animation {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
         }
         .list-group-item {
             font-size: 1.1em;
@@ -31,8 +43,11 @@
     </style>
 </head>
 <body>
+    <div id="flashImage" class="text-center mt-5">
+        <img src="gdu.jpeg" alt="Flashing Image" class="flash" id="flashingImage">
+    </div>
     <div class="container mt-5">
-        <img id="logo" src="beer.jpg" alt="Beer Logo">
+        <img id="logo" src="beer.jpeg" alt="Beer Logo">
         <h1 class="text-center">Beer Type Classifier</h1>
         <form id="uploadForm" class="mt-4">
             <div class="mb-3">
@@ -45,6 +60,17 @@
     </div>
 
     <script>
+        window.addEventListener('load', () => {
+            const flashImage = document.getElementById('flashImage');
+            const container = document.querySelector('.container');
+
+            // Set a timer to hide the flashing image and show the main container after 2 seconds
+            setTimeout(() => {
+                flashImage.style.display = 'none';
+                container.style.display = 'block';
+            }, 2000);
+        });
+
         const API_URL = "https://api-inference.huggingface.co/models/openai/clip-vit-large-patch14";
         const API_KEY = "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";
         const BEER_TYPES = [
@@ -83,16 +109,26 @@
                     const resultDiv = document.getElementById('result');
                     if (response.ok) {
                         const data = await response.json();
-                        const labels = data.labels || BEER_TYPES;
-                        const probabilities = data.scores || [];
+                        if (data && Array.isArray(data.labels) && Array.isArray(data.scores)) {
+                            const labels = data.labels;
+                            const probabilities = data.scores;
 
-                        let resultHtml = '<h2>Predicted Beer Type:</h2><ul class="list-group">';
-                        labels.forEach((label, index) => {
-                            resultHtml += `<li class="list-group-item">${label} - ${Math.round(probabilities[index] * 100)}%</li>`;
-                        });
-                        resultHtml += '</ul>';
+                            if (labels.length !== probabilities.length) {
+                                resultDiv.innerHTML = '<p class="text-danger">Unexpected response structure.</p>';
+                                return;
+                            }
 
-                        resultDiv.innerHTML = resultHtml;
+                            let resultHtml = '<h2>Predicted Beer Type:</h2><ul class="list-group">';
+                            labels.forEach((label, index) => {
+                                const probability = (probabilities[index] * 100).toFixed(2);
+                                resultHtml += `<li class="list-group-item">${label} - ${probability}%</li>`;
+                            });
+                            resultHtml += '</ul>';
+
+                            resultDiv.innerHTML = resultHtml;
+                        } else {
+                            resultDiv.innerHTML = '<p class="text-danger">Invalid response data.</p>';
+                        }
                     } else {
                         const error = await response.json();
                         resultDiv.innerHTML = `<p class="text-danger">Error: ${error.error}</p>`;

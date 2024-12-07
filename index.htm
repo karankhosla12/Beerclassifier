@@ -32,7 +32,7 @@
 </head>
 <body>
     <div class="container mt-5">
-        <img id="logo" src="beer.jpeg" alt="Beer Logo">
+        <img id="logo" src="beer.jpg" alt="Beer Logo">
         <h1 class="text-center">Beer Type Classifier</h1>
         <form id="uploadForm" class="mt-4">
             <div class="mb-3">
@@ -48,10 +48,8 @@
         const API_URL = "https://api-inference.huggingface.co/models/openai/clip-vit-large-patch14";
         const API_KEY = "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";
         const BEER_TYPES = [
-            "Pale Lager", "Dark Lager", "Amber Lager", "Bock", "Pale Ale", "India Pale Ale (IPA)",
-            "Amber Ale", "Brown Ale", "Porter", "Stout", "Wheat Beer", "Saison", "Barleywine",
-            "Sour Beer", "Fruit Beer", "Spiced/Herbed Beer", "Smoked Beer", "Cream Ale",
-            "Kölsch", "Altbier"
+            "Pale Lager", "Dark Lager", "Amber Lager", "Pale Ale", "India Pale Ale (IPA)",
+            "Porter", "Stout", "Wheat Beer", "Sour Beer", "Fruit Beer"
         ];
 
         document.getElementById('uploadForm').addEventListener('submit', async (event) => {

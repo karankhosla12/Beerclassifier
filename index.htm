@@ -13,9 +13,15 @@
         h1 {
             color: #343a40;
         }
-        #logo {
+        #mainLogo {
             display: block;
             margin: 0 auto;
+            width: 150px;
+            border-radius: 50%;
+        }
+        #flashLogo {
+            display: block;
+            margin: 20px auto;
             width: 150px;
             border-radius: 50%;
             animation: flash 1s linear infinite;
@@ -50,7 +56,8 @@
 </head>
 <body>
     <div class="container mt-5">
-        <img id="logo" src="gdu.jpeg" alt="Beer Logo">
+        <img id="flashLogo" src="gdu.jpeg" alt="Flash Logo">
+        <img id="mainLogo" src="beer.jpeg" alt="Beer Logo">
         <h1 class="text-center">Beer Type Classifier</h1>
         <form id="uploadForm" class="mt-4">
             <div class="mb-3">
@@ -71,10 +78,10 @@
             "Porter", "Stout", "Wheat Beer", "Sour Beer", "Fruit Beer"
         ];
 
-        // Flash the image on page load
+        // Flash the gdu.jpeg image on page load
         window.addEventListener('load', () => {
-            const logo = document.getElementById('logo');
-            logo.style.animation = 'flash 1s linear';
+            const flashLogo = document.getElementById('flashLogo');
+            flashLogo.style.animation = 'flash 1s linear';
         });
 
         document.getElementById('uploadForm').addEventListener('submit', async (event) => {
@@ -112,19 +119,11 @@
                         const data = await response.json();
                         outputBox.textContent = JSON.stringify(data, null, 2); // Display raw JSON response
 
-                        if (data && Array.isArray(data.labels) && Array.isArray(data.scores)) {
-                            const labels = data.labels;
-                            const probabilities = data.scores;
-
-                            if (labels.length !== probabilities.length) {
-                                resultDiv.innerHTML = '<p class="text-danger">Error: Mismatched labels and scores.</p>';
-                                return;
-                            }
-
-                            let resultHtml = '<h2>Predicted Beer Type:</h2><ul class="list-group">';
-                            labels.forEach((label, index) => {
-                                const probability = (probabilities[index] * 100).toFixed(2);
-                                resultHtml += `<li class="list-group-item">${label} - ${probability}%</li>`;
+                        if (data && Array.isArray(data)) {
+                            let resultHtml = '<h2>Predicted Beer Types:</h2><ul class="list-group">';
+                            data.forEach(item => {
+                                const probability = (item.score * 100).toFixed(2);
+                                resultHtml += `<li class="list-group-item">${item.label} - ${probability}%</li>`;
                             });
                             resultHtml += '</ul>';
 

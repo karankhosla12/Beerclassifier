@@ -24,7 +24,7 @@
             margin: 20px auto;
             width: 150px;
             border-radius: 50%;
-            animation: flash 1s linear infinite;
+            animation: spinFlash 1s linear infinite;
         }
         .container {
             background: #ffffff;
@@ -35,28 +35,31 @@
         .list-group-item {
             font-size: 1.1em;
         }
-        #outputBox {
-            background: #f1f1f1;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 15px;
-            max-height: 300px;
-            overflow-y: auto;
-            font-family: monospace;
-        }
-        @keyframes flash {
-            0%, 100% {
+        @keyframes spinFlash {
+            0% {
+                transform: rotate(0deg);
                 opacity: 1;
             }
+            25% {
+                opacity: 0.5;
+            }
             50% {
-                opacity: 0;
+                transform: rotate(180deg);
+                opacity: 1;
+            }
+            75% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: rotate(360deg);
+                opacity: 1;
             }
         }
     </style>
 </head>
 <body>
     <div class="container mt-5">
-        <img id="flashLogo" src="gdu.jpeg" alt="Flash Logo">
+        <img id="flashLogo" src="gdu.jpeg" alt="Loading Logo">
         <img id="mainLogo" src="beer.jpeg" alt="Beer Logo">
         <h1 class="text-center">Beer Type Classifier</h1>
         <form id="uploadForm" class="mt-4">
@@ -67,7 +70,6 @@
             <button type="submit" class="btn btn-primary">Classify</button>
         </form>
         <div id="result" class="mt-4"></div>
-        <div id="outputBox"></div>
     </div>
 
     <script>
@@ -78,10 +80,12 @@
             "Porter", "Stout", "Wheat Beer", "Sour Beer", "Fruit Beer"
         ];
 
-        // Flash the gdu.jpeg image on page load
+        // Hide the flash logo after page load to only show the main content
         window.addEventListener('load', () => {
-            const flashLogo = document.getElementById('flashLogo');
-            flashLogo.style.animation = 'flash 1s linear';
+            setTimeout(() => {
+                const flashLogo = document.getElementById('flashLogo');
+                flashLogo.style.display = 'none';
+            }, 2000); // Flash logo will spin and flash for 2 seconds
         });
 
         document.getElementById('uploadForm').addEventListener('submit', async (event) => {
@@ -113,12 +117,9 @@
                     });
 
                     const resultDiv = document.getElementById('result');
-                    const outputBox = document.getElementById('outputBox');
 
                     if (response.ok) {
                         const data = await response.json();
-                        outputBox.textContent = JSON.stringify(data, null, 2); // Display raw JSON response
-
                         if (data && Array.isArray(data)) {
                             let resultHtml = '<h2>Predicted Beer Types:</h2><ul class="list-group">';
                             data.forEach(item => {
@@ -133,12 +134,10 @@
                         }
                     } else {
                         const error = await response.json();
-                        outputBox.textContent = JSON.stringify(error, null, 2); // Display raw JSON error
                         resultDiv.innerHTML = `<p class="text-danger">Error: ${error.error}</p>`;
                     }
                 } catch (error) {
                     document.getElementById('result').innerHTML = `<p class="text-danger">An error occurred: ${error.message}</p>`;
-                    outputBox.textContent = JSON.stringify(error, null, 2); // Display raw error in the output box
                 }
             };
 
